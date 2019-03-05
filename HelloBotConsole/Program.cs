@@ -12,10 +12,11 @@ namespace HelloBotConsole
 
             Console.WriteLine($"Hello World I'm the:  ID:{me.Id} / FirstName:{me.FirstName} / Username:{me.Username}!");
 
-            System.Threading.Thread.Sleep(2000);
+            Console.WriteLine("Press any key to continue..");
+            Console.ReadKey();
             Console.Clear();
             Console.WriteLine("Bye..");
-            System.Threading.Thread.Sleep(2000);
+            System.Threading.Thread.Sleep(1000);
         }
     }
 }
