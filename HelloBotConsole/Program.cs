@@ -11,6 +11,11 @@ namespace HelloBotConsole
             var me = botClient.GetMeAsync().Result;
 
             Console.WriteLine($"Hello World I'm the:  ID:{me.Id} / FirstName:{me.FirstName} / Username:{me.Username}!");
+
+            System.Threading.Thread.Sleep(2000);
+            Console.Clear();
+            Console.WriteLine("Bye..");
+            System.Threading.Thread.Sleep(2000);
         }
     }
 }
