@@ -21,9 +21,14 @@ namespace HelloBotConsole.Commands
         {
             try
             {
-                await _botClient.SendVideoAsync(
-                    e.Message.Chat,
-                    "https://github.com/TelegramBots/book/blob/master/src/docs/video-hawk.mp4");
+                using (var stream = System.IO.File.OpenRead("../media/waves.mp4")) {
+                    await _botClient.SendVideoNoteAsync(
+                        chatId: e.Message.Chat,
+                        videoNote: stream,
+                        duration: 47,
+                        length: 360 // value of width/height
+                    );
+                }
             }
             catch (Exception exception)
             {

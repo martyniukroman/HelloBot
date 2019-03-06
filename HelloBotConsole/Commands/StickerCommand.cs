@@ -21,8 +21,9 @@ namespace HelloBotConsole.Commands
             try
             {
                 await _botClient.SendStickerAsync(
-                    e.Message.Chat,
-                    "https://github.com/TelegramBots/book/blob/master/src/docs/sticker-dali.webp");
+                    chatId: e.Message.Chat,
+                    sticker: "https://github.com/TelegramBots/book/raw/master/src/docs/sticker-fred.webp"
+                    );
             }
             catch (Exception exception)
             {
