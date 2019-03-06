@@ -22,7 +22,7 @@ namespace HelloBotConsole.Commands
             try
             {
                 _botClient.OnMessage += SubmitReboot;
-               await _botClient.SendTextMessageAsync(e.Message.Chat, "This command in development");
+               await _botClient.SendTextMessageAsync(e.Message.Chat, "This command is for root only");
               // await _botClient.SendTextMessageAsync(e.Message.Chat, "Are you sure to reboot server machine?");
                 // System.Diagnostics.Process.Start("shutdown.exe", "-r -t 0");
               //  SubmitReboot(null,e);
