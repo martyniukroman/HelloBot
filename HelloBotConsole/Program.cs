@@ -59,31 +59,31 @@ namespace HelloBotConsole
 
             try
             {
-                if (e.Message.Text == "!text")
+                if (e.Message.Text == "/text")
                 {
                     await _textCommand.ExecuteCommand(e);
                 }
-                else if (e.Message.Text == "!sticker")
+                else if (e.Message.Text == "/sticker")
                 {
                     await _stickerCommand.ExecuteCommand(e);
                 }
-                else if (e.Message.Text == "!video")
+                else if (e.Message.Text == "/video")
                 {
                     await botClient.SendChatActionAsync(e.Message.Chat, ChatAction.RecordVideo);
                     await _videoCommand.ExecuteCommand(e);
                 }
-                else if (e.Message.Text == "!picture")
+                else if (e.Message.Text == "/picture")
                 {
                     await _pictureCommand.ExecuteCommand(e);
                 }
-                else if (e.Message.Text == "!rootreboot")
+                else if (e.Message.Text == "/rootreboot")
                 {
                     await botClient.SendChatActionAsync(e.Message.Chat, ChatAction.UploadDocument);
                     botClient.OnMessage -= BotOnMessage;
                     await _rebootCommand.ExecuteCommand(e);
                     botClient.OnMessage += BotOnMessage;
                 }
-                else if (e.Message.Text == "!audio")
+                else if (e.Message.Text == "/audio")
                 {
                     await botClient.SendChatActionAsync(e.Message.Chat, ChatAction.UploadAudio);
                     await _audioCommand.ExecuteCommand(e);
@@ -91,15 +91,15 @@ namespace HelloBotConsole
                 else
                 {
                     await botClient.SendTextMessageAsync(e.Message.Chat, "*Commands*:\n " +
-                                                                         " `!text \n " +
-                                                                         "!sticker \n " +
-                                                                         "!video \n " +
-                                                                         "!picture \n " +
-                                                                         "!audio \n " +
+                                                                         "/text \n " +
+                                                                         "/sticker \n " +
+                                                                         "/video \n " +
+                                                                         "/picture \n " +
+                                                                         "/audio \n " +
                                                                          "" +
                                                                          "" +
-                                                                         "!rootreboot \n " +
-                                                                         "`", ParseMode.Markdown);
+                                                                         "/rootreboot \n " +
+                                                                         "", ParseMode.Markdown);
                 }
             }
             catch (Exception exception)
