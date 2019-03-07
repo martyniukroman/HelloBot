@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using HelloBotConsole.Interfaces;
+using HelloBotConsole.Models;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types.Enums;
@@ -17,7 +18,7 @@ namespace HelloBotConsole.Commands
             _botClient = botClient;
         }
         
-        public async Task ExecuteCommand(MessageEventArgs e)
+        public async Task ExecuteCommand(MessageEventArgs e, Session session)
         {
             try
             {
@@ -39,5 +40,6 @@ namespace HelloBotConsole.Commands
                 throw  new Exception("Exception occured in AudioCommand: " + exception.Message);
             }
         }
+
     }
 }

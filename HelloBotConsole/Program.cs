@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Security;
 using HelloBotConsole.Commands;
+using HelloBotConsole.Models;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types.Enums;
@@ -52,41 +53,37 @@ namespace HelloBotConsole
                               $"\nWith user: {e.Message.Chat.Username}" +
                               $"\nWith message: {e.Message.Text}");
 
-//            await botClient.SendTextMessageAsync(e.Message.Chat, $"Message: {e.Message.Text} \n" +
-//                                                                 $"Sender: {e.Message.From} \n" +
-//                                                                 $"Date: {e.Message.Date} \n"
-
 
             try
             {
                 if (e.Message.Text == "/text")
                 {
-                    await _textCommand.ExecuteCommand(e);
+                    await _textCommand.ExecuteCommand(e, null);
                 }
                 else if (e.Message.Text == "/sticker")
                 {
-                    await _stickerCommand.ExecuteCommand(e);
+                    await _stickerCommand.ExecuteCommand(e, null);
                 }
                 else if (e.Message.Text == "/video")
                 {
                     await botClient.SendChatActionAsync(e.Message.Chat, ChatAction.RecordVideo);
-                    await _videoCommand.ExecuteCommand(e);
+                    await _videoCommand.ExecuteCommand(e, null);
                 }
                 else if (e.Message.Text == "/picture")
                 {
-                    await _pictureCommand.ExecuteCommand(e);
+                    await _pictureCommand.ExecuteCommand(e, null);
                 }
                 else if (e.Message.Text == "/rootreboot")
                 {
                     await botClient.SendChatActionAsync(e.Message.Chat, ChatAction.UploadDocument);
                     botClient.OnMessage -= BotOnMessage;
-                    await _rebootCommand.ExecuteCommand(e);
+                    await _rebootCommand.ExecuteCommand(e, new Session(e.Message.Chat.Id, "/rootreboot", SessionStatus.Started));
                     botClient.OnMessage += BotOnMessage;
                 }
                 else if (e.Message.Text == "/audio")
                 {
                     await botClient.SendChatActionAsync(e.Message.Chat, ChatAction.UploadAudio);
-                    await _audioCommand.ExecuteCommand(e);
+                    await _audioCommand.ExecuteCommand(e, null);
                 }
                 else
                 {
