@@ -8,6 +8,6 @@ namespace HelloBotConsole.Interfaces
 {
     public interface ICommand
     {     
-       Task ExecuteCommand(MessageEventArgs e, Session session);
+        Task<Session> ExecuteCommand(MessageEventArgs e, Session session);
     }
 }

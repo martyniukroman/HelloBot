@@ -18,7 +18,7 @@ namespace HelloBotConsole.Commands
             _botClient = botClient;
         }
         
-        public async Task ExecuteCommand(MessageEventArgs e, Session session)
+        public async Task<Session> ExecuteCommand(MessageEventArgs e, Session session)
         {
             try
             {
@@ -31,6 +31,8 @@ namespace HelloBotConsole.Commands
             {
                 throw  new Exception("Exception occured in PictureCommand: " + exception.Message);
             }
+            
+            return null;
         }
     }
 }

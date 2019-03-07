@@ -6,7 +6,9 @@ using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
+using HelloBotConsole;
 
+                // System.Diagnostics.Process.Start("shutdown.exe", "-r -t 0");
 namespace HelloBotConsole.Commands
 {
     public class RebootCommand : ICommand
@@ -19,7 +21,7 @@ namespace HelloBotConsole.Commands
             _botClient = botClient;
         }
 
-        public async Task ExecuteCommand(MessageEventArgs e, Session session)
+        public async Task<Session> ExecuteCommand(MessageEventArgs e, Session session)
         {
             _currentSesion = session;
             try
@@ -27,22 +29,15 @@ namespace HelloBotConsole.Commands
                 _botClient.OnMessage += SubmitReboot;
                 await _botClient.SendTextMessageAsync(e.Message.Chat,
                     "This command is for root only,\n`Prove your identity`", parseMode: ParseMode.Markdown);
-                // await _botClient.SendTextMessageAsync(e.Message.Chat, "Are you sure to reboot server machine?");
-                // System.Diagnostics.Process.Start("shutdown.exe", "-r -t 0");
-
-                do
-                {
-                    _currentSesion.Status = SessionStatus.InProgress;
-                   SubmitReboot(null, e);
-                   System.Threading.Thread.Sleep(5000);
-                } while (_currentSesion.Status != SessionStatus.Finished);
-
-                _botClient.OnMessage -= SubmitReboot;
+                
+                    _currentSesion.Status = SessionStatus.Started;
+              
             }
             catch (Exception exception)
             {
                 throw new Exception("Exception occured in RebootCommand: " + exception.Message);
             }
+            return _currentSesion;
         }
 
         private async void SubmitReboot(object sender, MessageEventArgs e)
@@ -57,7 +52,17 @@ namespace HelloBotConsole.Commands
                 await _botClient.SendTextMessageAsync(e.Message.Chat, "Rebooting doesn\'t execute");
                 _currentSesion.Status = SessionStatus.Finished;
             }
-           
+            else
+            {
+                await _botClient.SendTextMessageAsync(e.Message.Chat, "Use /stop to exit");
+            }
+            
+            if (_currentSesion.Status == SessionStatus.Finished)
+            {
+                _botClient.OnMessage -= SubmitReboot;
+            }
+             
+            
         }
     }
 }

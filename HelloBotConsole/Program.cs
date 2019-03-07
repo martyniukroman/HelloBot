@@ -77,8 +77,11 @@ namespace HelloBotConsole
                 {
                     await botClient.SendChatActionAsync(e.Message.Chat, ChatAction.UploadDocument);
                     botClient.OnMessage -= BotOnMessage;
-                    await _rebootCommand.ExecuteCommand(e, new Session(e.Message.Chat.Id, "/rootreboot", SessionStatus.Started));
-                    botClient.OnMessage += BotOnMessage;
+                    Session session = await _rebootCommand.ExecuteCommand(e,
+                        new Session(e.Message.Chat.Id, "/rootreboot", SessionStatus.Started));
+
+                        botClient.OnMessage += BotOnMessage;
+
                 }
                 else if (e.Message.Text == "/audio")
                 {
