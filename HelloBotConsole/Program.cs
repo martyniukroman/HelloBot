@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Security;
 using HelloBotConsole.Commands;
 using HelloBotConsole.Models;
@@ -12,14 +14,16 @@ namespace HelloBotConsole
 {
     class Program
     {
-        public static ITelegramBotClient botClient;
-
+        private static ITelegramBotClient botClient;
         private static StickerCommand _stickerCommand;
         private static TextCommand _textCommand;
         private static VideoCommand _videoCommand;
         private static PictureCommand _pictureCommand;
         private static RebootCommand _rebootCommand;
         private static AudioCommand _audioCommand;
+
+        private static List<Session> Sessions = new List<Session>();
+        private static Session _requestedSession = null;
 
         static void Main(string[] args)
         {
@@ -47,68 +51,70 @@ namespace HelloBotConsole
         }
 
 
-        public static async void BotOnMessage(object sender, MessageEventArgs e)
+        private static async void BotOnMessage(object sender, MessageEventArgs e)
         {
             Console.WriteLine($"Received a text message in chat: {e.Message.Chat.Id}" +
                               $"\nWith user: {e.Message.Chat.Username}" +
                               $"\nWith message: {e.Message.Text}");
 
-
             try
             {
-                if (e.Message.Text == "/text")
+                if (_requestedSession == null)
                 {
-                    await _textCommand.ExecuteCommand(e, null);
-                }
-                else if (e.Message.Text == "/sticker")
-                {
-                    await _stickerCommand.ExecuteCommand(e, null);
-                }
-                else if (e.Message.Text == "/video")
-                {
-                    await botClient.SendChatActionAsync(e.Message.Chat, ChatAction.RecordVideo);
-                    await _videoCommand.ExecuteCommand(e, null);
-                }
-                else if (e.Message.Text == "/picture")
-                {
-                    await _pictureCommand.ExecuteCommand(e, null);
-                }
-                else if (e.Message.Text == "/rootreboot")
-                {
-                    await botClient.SendChatActionAsync(e.Message.Chat, ChatAction.UploadDocument);
-                    botClient.OnMessage -= BotOnMessage;
-                    Session session = await _rebootCommand.ExecuteCommand(e,
-                        new Session(e.Message.Chat.Id, "/rootreboot", SessionStatus.Started));
+                    try
+                    {
+                        if (e.Message.Text == "/text")
+                        {
+                            await _textCommand.ExecuteCommand(e, null);
+                        }
+                        else if (e.Message.Text == "/sticker")
+                        {
+                            await _stickerCommand.ExecuteCommand(e, null);
+                        }
+                        else if (e.Message.Text == "/video")
+                        {
+                            await botClient.SendChatActionAsync(e.Message.Chat, ChatAction.RecordVideo);
+                            await _videoCommand.ExecuteCommand(e, null);
+                        }
+                        else if (e.Message.Text == "/picture")
+                        {
+                            await _pictureCommand.ExecuteCommand(e, null);
+                        }
+                        else if (e.Message.Text == "/rootreboot")
+                        {
+                            Sessions.Add(new Session(_rebootCommand, e.Message.Chat.Id, "/rootreboot",
+                                SessionStatus.Undefined));
+                            _requestedSession = await _rebootCommand.ExecuteCommand(e, Sessions.Last());
+                        }
+                        else if (e.Message.Text == "/audio")
+                        {
+                            await botClient.SendChatActionAsync(e.Message.Chat, ChatAction.UploadAudio);
+                            await _audioCommand.ExecuteCommand(e, null);
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        await botClient.SendTextMessageAsync(
+                            e.Message.Chat, $"*{exception.Message}*",
+                            parseMode: ParseMode.Markdown);
 
-                        botClient.OnMessage += BotOnMessage;
-
-                }
-                else if (e.Message.Text == "/audio")
-                {
-                    await botClient.SendChatActionAsync(e.Message.Chat, ChatAction.UploadAudio);
-                    await _audioCommand.ExecuteCommand(e, null);
+                        Console.WriteLine($"*{exception.Message}*");
+                    }
                 }
                 else
                 {
-                    await botClient.SendTextMessageAsync(e.Message.Chat, "*Commands*:\n " +
-                                                                         "/text \n " +
-                                                                         "/sticker \n " +
-                                                                         "/video \n " +
-                                                                         "/picture \n " +
-                                                                         "/audio \n " +
-                                                                         "" +
-                                                                         "" +
-                                                                         "/rootreboot \n " +
-                                                                         "", ParseMode.Markdown);
+                    var _searchSession = Sessions.Find((s) => s.SessionChatId == _requestedSession.SessionChatId);
+
+                    if (_requestedSession != null && _requestedSession.isEqualTo(_searchSession))
+                    {
+                        _requestedSession =
+                            await _requestedSession.CommandSessionHandler.ExecuteCommand(e, _requestedSession);
+                    } //the program skips this if 
                 }
             }
             catch (Exception exception)
             {
-                await botClient.SendTextMessageAsync(
-                    e.Message.Chat, $"*{exception.Message}*",
-                    parseMode: ParseMode.Markdown);
-
-                Console.WriteLine($"*{exception.Message}*");
+                Console.WriteLine(exception);
             }
         }
     }

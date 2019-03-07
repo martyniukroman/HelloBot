@@ -8,7 +8,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using HelloBotConsole;
 
-                // System.Diagnostics.Process.Start("shutdown.exe", "-r -t 0");
+// System.Diagnostics.Process.Start("shutdown.exe", "-r -t 0");
 namespace HelloBotConsole.Commands
 {
     public class RebootCommand : ICommand
@@ -24,45 +24,27 @@ namespace HelloBotConsole.Commands
         public async Task<Session> ExecuteCommand(MessageEventArgs e, Session session)
         {
             _currentSesion = session;
-            try
-            {
-                _botClient.OnMessage += SubmitReboot;
-                await _botClient.SendTextMessageAsync(e.Message.Chat,
-                    "This command is for root only,\n`Prove your identity`", parseMode: ParseMode.Markdown);
-                
-                    _currentSesion.Status = SessionStatus.Started;
-              
-            }
-            catch (Exception exception)
-            {
-                throw new Exception("Exception occured in RebootCommand: " + exception.Message);
-            }
-            return _currentSesion;
-        }
 
-        private async void SubmitReboot(object sender, MessageEventArgs e)
-        {
-            if (e.Message.Text == "1" || e.Message.Text == "yes")
+            if (e.Message.Text == "1")
             {
-                await _botClient.SendTextMessageAsync(e.Message.Chat, "REBOOTING");
+                await _botClient.SendTextMessageAsync(e.Message.Chat, "rebooting");
                 _currentSesion.Status = SessionStatus.Finished;
+                return null;
             }
-            else if (e.Message.Text == "/stop")
+
+            if (e.Message.Text == "/stop")
             {
-                await _botClient.SendTextMessageAsync(e.Message.Chat, "Rebooting doesn\'t execute");
+                await _botClient.SendTextMessageAsync(e.Message.Chat, "/stop executed");
                 _currentSesion.Status = SessionStatus.Finished;
+                return null;
             }
             else
             {
-                await _botClient.SendTextMessageAsync(e.Message.Chat, "Use /stop to exit");
+                await _botClient.SendTextMessageAsync(e.Message.Chat,
+                    "You are in /rootreboot method\nprove your identity\nUse /stop to exit");
             }
-            
-            if (_currentSesion.Status == SessionStatus.Finished)
-            {
-                _botClient.OnMessage -= SubmitReboot;
-            }
-             
-            
+
+            return _currentSesion;
         }
     }
 }
