@@ -21,6 +21,7 @@ namespace HelloBotConsole
         private static PictureCommand _pictureCommand;
         private static RebootCommand _rebootCommand;
         private static AudioCommand _audioCommand;
+        private static HelpCommand _helpCommand;
 
         private static List<Session> Sessions = new List<Session>();
         private static Session _requestedSession = null;
@@ -36,6 +37,7 @@ namespace HelloBotConsole
             _pictureCommand = new PictureCommand(botClient);
             _rebootCommand = new RebootCommand(botClient);
             _audioCommand = new AudioCommand(botClient);
+            _helpCommand = new HelpCommand(botClient);
 
 
             botClient.OnMessage += BotOnMessage;
@@ -87,6 +89,20 @@ namespace HelloBotConsole
                                 await botClient.SendChatActionAsync(e.Message.Chat, ChatAction.UploadAudio);
                                 await _audioCommand.ExecuteCommand(e, null);
                                 break;
+                            case "/help":
+                                Sessions.Add(
+                                    new Session( _helpCommand,
+                                    e.Message.Chat.Id, "/help",
+                                    SessionStatus.Undefined));
+
+                                _requestedSession = await _helpCommand.ExecuteCommand(e, Sessions.Last());
+                                break;
+                            default:
+                                await botClient.SendTextMessageAsync(
+                                    e.Message.Chat, $"Use /help to get additional info",
+                                    parseMode: ParseMode.Markdown);
+                                break;
+                            
                         }
                     }
                     catch (Exception exception)
@@ -107,7 +123,7 @@ namespace HelloBotConsole
                         _requestedSession =
                             await _requestedSession.CommandSessionHandler.ExecuteCommand(e, _requestedSession);
 
-                        if (_requestedSession == null)
+                        if (_requestedSession == null || !_requestedSession.isEqualTo(searchSession))
                         {
                             Sessions.Remove(searchSession);
                         }
