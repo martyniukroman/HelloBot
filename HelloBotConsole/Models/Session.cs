@@ -36,8 +36,8 @@ namespace HelloBotConsole.Models
     public enum SessionStatus
     {
         Undefined = 0,
-        Started = 1,
-        InProgress = 2,
-        Finished = 3,
+        Started,
+        InProgress,
+        Finished,
     }
 }

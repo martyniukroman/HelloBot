@@ -37,7 +37,8 @@ namespace HelloBotConsole.Commands
             {
                 await _botClient.SendTextMessageAsync(e.Message.Chat,
                     "/rootreboot - `Reboots a server machine`\n" +
-                    "/help - `Gives you an information about commands`\n", ParseMode.Markdown);
+                    "/help - `Gives you an information about commands`\n" +
+                    "/form - `Apply form with your data`\n", ParseMode.Markdown);
                 return session;
             }
             if (e.Message.Text == "/stop")
@@ -46,15 +47,13 @@ namespace HelloBotConsole.Commands
                 session.Status = SessionStatus.Finished;
                 return null;
             }
-            else
-            {
-                await _botClient.SendTextMessageAsync(e.Message.Chat,
-                    "/basiccommands - `Basic Commands returns one message and no shit stuff`\n" +
-                    "/workflowcommands - `Workflow Commands have inner logic and can ask for additional values to interact with them`\n" +
-                    "", ParseMode.Markdown);
-            }
-            
-                return session;
+
+            await _botClient.SendTextMessageAsync(e.Message.Chat,
+                "/basiccommands - `Basic Commands returns one message and no shit stuff`\n" +
+                "/workflowcommands - `Workflow Commands have inner logic and can ask for additional values to interact with them`\n" +
+                "", ParseMode.Markdown);
+
+            return session;
         }
     }
 }

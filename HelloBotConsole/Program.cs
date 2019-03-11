@@ -22,6 +22,7 @@ namespace HelloBotConsole
         private static RebootCommand _rebootCommand;
         private static AudioCommand _audioCommand;
         private static HelpCommand _helpCommand;
+        private static FormCommand _formCommand;
 
         private static List<Session> Sessions = new List<Session>();
         private static Session _requestedSession = null;
@@ -38,9 +39,12 @@ namespace HelloBotConsole
             _rebootCommand = new RebootCommand(botClient);
             _audioCommand = new AudioCommand(botClient);
             _helpCommand = new HelpCommand(botClient);
+            _formCommand = new FormCommand(botClient);
 
 
             botClient.OnMessage += BotOnMessage;
+            botClient.OnMessageEdited += BotOnMessage;
+            botClient.OnCallbackQuery += BotOnQuery;
             botClient.StartReceiving();
 
 
@@ -91,18 +95,21 @@ namespace HelloBotConsole
                                 break;
                             case "/help":
                                 Sessions.Add(
-                                    new Session( _helpCommand,
-                                    e.Message.Chat.Id, "/help",
-                                    SessionStatus.Undefined));
+                                    new Session(_helpCommand,
+                                        e.Message.Chat.Id, "/help",
+                                        SessionStatus.Undefined));
 
                                 _requestedSession = await _helpCommand.ExecuteCommand(e, Sessions.Last());
+                                break;
+                            case "/form":
+                                Sessions.Add(new Session(_formCommand, e.Message.Chat.Id, "/form", SessionStatus.Undefined));
+                                _requestedSession = await _formCommand.ExecuteCommand(e, Sessions.Last());
                                 break;
                             default:
                                 await botClient.SendTextMessageAsync(
                                     e.Message.Chat, $"Use /help to get additional info",
                                     parseMode: ParseMode.Markdown);
                                 break;
-                            
                         }
                     }
                     catch (Exception exception)
@@ -118,16 +125,15 @@ namespace HelloBotConsole
                 {
                     var searchSession = Sessions.Find((s) => s.SessionChatId == _requestedSession.SessionChatId);
 
-                    if (_requestedSession != null && _requestedSession.isEqualTo(searchSession))
+                    if (_requestedSession != null)
                     {
                         _requestedSession =
                             await _requestedSession.CommandSessionHandler.ExecuteCommand(e, _requestedSession);
 
-                        if (_requestedSession == null || !_requestedSession.isEqualTo(searchSession))
+                        if (_requestedSession == null)
                         {
                             Sessions.Remove(searchSession);
                         }
-                        
                     }
                     else
                     {
@@ -140,5 +146,18 @@ namespace HelloBotConsole
                 Console.WriteLine(exception);
             }
         }
+
+        private static async void BotOnQuery(object sender, CallbackQueryEventArgs callback)
+        {
+
+            var query = callback.CallbackQuery;
+            
+            await botClient.AnswerCallbackQueryAsync(query.Id,  $"Received {query.Data}");
+            
+            await botClient.SendTextMessageAsync(
+                query.Message.Chat.Id,
+                $"Callback Received {query.Data}");
+        }
+        
     }
 }
