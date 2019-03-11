@@ -63,33 +63,30 @@ namespace HelloBotConsole
                 {
                     try
                     {
-                        if (e.Message.Text == "/text")
+                        switch (e.Message.Text)
                         {
-                            await _textCommand.ExecuteCommand(e, null);
-                        }
-                        else if (e.Message.Text == "/sticker")
-                        {
-                            await _stickerCommand.ExecuteCommand(e, null);
-                        }
-                        else if (e.Message.Text == "/video")
-                        {
-                            await botClient.SendChatActionAsync(e.Message.Chat, ChatAction.RecordVideo);
-                            await _videoCommand.ExecuteCommand(e, null);
-                        }
-                        else if (e.Message.Text == "/picture")
-                        {
-                            await _pictureCommand.ExecuteCommand(e, null);
-                        }
-                        else if (e.Message.Text == "/rootreboot")
-                        {
-                            Sessions.Add(new Session(_rebootCommand, e.Message.Chat.Id, "/rootreboot",
-                                SessionStatus.Undefined));
-                            _requestedSession = await _rebootCommand.ExecuteCommand(e, Sessions.Last());
-                        }
-                        else if (e.Message.Text == "/audio")
-                        {
-                            await botClient.SendChatActionAsync(e.Message.Chat, ChatAction.UploadAudio);
-                            await _audioCommand.ExecuteCommand(e, null);
+                            case "/text":
+                                await _textCommand.ExecuteCommand(e, null);
+                                break;
+                            case "/sticker":
+                                await _stickerCommand.ExecuteCommand(e, null);
+                                break;
+                            case "/video":
+                                await botClient.SendChatActionAsync(e.Message.Chat, ChatAction.RecordVideo);
+                                await _videoCommand.ExecuteCommand(e, null);
+                                break;
+                            case "/picture":
+                                await _pictureCommand.ExecuteCommand(e, null);
+                                break;
+                            case "/rootreboot":
+                                Sessions.Add(new Session(_rebootCommand, e.Message.Chat.Id, "/rootreboot",
+                                    SessionStatus.Undefined));
+                                _requestedSession = await _rebootCommand.ExecuteCommand(e, Sessions.Last());
+                                break;
+                            case "/audio":
+                                await botClient.SendChatActionAsync(e.Message.Chat, ChatAction.UploadAudio);
+                                await _audioCommand.ExecuteCommand(e, null);
+                                break;
                         }
                     }
                     catch (Exception exception)
@@ -103,22 +100,22 @@ namespace HelloBotConsole
                 }
                 else
                 {
-                    var _searchSession = Sessions.Find((s) => s.SessionChatId == _requestedSession.SessionChatId);
+                    var searchSession = Sessions.Find((s) => s.SessionChatId == _requestedSession.SessionChatId);
 
-                    if (_requestedSession != null && _requestedSession.isEqualTo(_searchSession))
+                    if (_requestedSession != null && _requestedSession.isEqualTo(searchSession))
                     {
                         _requestedSession =
                             await _requestedSession.CommandSessionHandler.ExecuteCommand(e, _requestedSession);
 
                         if (_requestedSession == null)
                         {
-                            Sessions.Remove(_searchSession);
+                            Sessions.Remove(searchSession);
                         }
                         
                     }
                     else
                     {
-                        Sessions.Remove(_searchSession);
+                        Sessions.Remove(searchSession);
                     }
                 }
             }

@@ -25,23 +25,20 @@ namespace HelloBotConsole.Commands
         {
             _currentSesion = session;
 
-            if (e.Message.Text == "1")
+            switch (e.Message.Text)
             {
-                await _botClient.SendTextMessageAsync(e.Message.Chat, "rebooting");
-                _currentSesion.Status = SessionStatus.Finished;
-                return null;
-            }
-
-            if (e.Message.Text == "/stop")
-            {
-                await _botClient.SendTextMessageAsync(e.Message.Chat, "/stop executed");
-                _currentSesion.Status = SessionStatus.Finished;
-                return null;
-            }
-            else
-            {
-                await _botClient.SendTextMessageAsync(e.Message.Chat,
-                    "You are in /rootreboot method\nprove your identity\nUse /stop to exit");
+                case "1":
+                    await _botClient.SendTextMessageAsync(e.Message.Chat, "rebooting");
+                    _currentSesion.Status = SessionStatus.Finished;
+                    return null;
+                case "/stop":
+                    await _botClient.SendTextMessageAsync(e.Message.Chat, "/stop executed");
+                    _currentSesion.Status = SessionStatus.Finished;
+                    return null;
+                default:
+                    await _botClient.SendTextMessageAsync(e.Message.Chat,
+                        "You are in /rootreboot method\nUse /stop to exit\n`prove your identity`", ParseMode.Markdown);
+                    break;
             }
 
             return _currentSesion;
