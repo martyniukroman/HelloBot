@@ -109,7 +109,17 @@ namespace HelloBotConsole
                     {
                         _requestedSession =
                             await _requestedSession.CommandSessionHandler.ExecuteCommand(e, _requestedSession);
-                    } //the program skips this if 
+
+                        if (_requestedSession == null)
+                        {
+                            Sessions.Remove(_searchSession);
+                        }
+                        
+                    }
+                    else
+                    {
+                        Sessions.Remove(_searchSession);
+                    }
                 }
             }
             catch (Exception exception)
