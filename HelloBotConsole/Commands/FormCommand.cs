@@ -24,56 +24,61 @@ namespace HelloBotConsole.Commands
 
         public async Task<Session> ExecuteCommand(MessageEventArgs e, Session session)
         {
-//            if (e.Message.Text == "/stop")
-//            {
-//                await _botClient.SendTextMessageAsync(e.Message.Chat, "/stop executed");
-//                session.Status = SessionStatus.Finished;
-//                return null;
-//            }
-//
-//            if (e.Message.Text.Contains("/name"))
-//            {
-//                user.Name = e.Message.Text.Split(" ", StringSplitOptions.RemoveEmptyEntries).Last();
-//            }
-//
-//            if (e.Message.Text.Contains("/age"))
-//            {
-//                user.Age = Convert.ToInt32(e.Message.Text.Split(" ", StringSplitOptions.RemoveEmptyEntries).Last());
-//            }
-//
-//            if (e.Message.Text.Contains("/submit"))
-//            {
-//                await _botClient.SendTextMessageAsync(e.Message.Chat,
-//                    "Your credentials: \n" +
-//                    $"   `/name` {user.Name}\n" +
-//                    $"   `/age`  {user.Age}\n", ParseMode.Markdown);
-//
-//                session.Status = SessionStatus.Finished;
-//                
-//                return null;
-//            }
-//
-//            var inline = new InlineKeyboardMarkup(InlineKeyboardButton.WithCallbackData("Enter your name", "name"));
-//            
-//            await _botClient.SendTextMessageAsync(e.Message.Chat,
-//                "Enter your name and age in next format in separate messages: \n" +
-//                $"   /name `yourname:` {user.Name}\n" +
-//                $"   /age `yourage:`  {user.Age}\n" +
-//                "use /submit for applying the `/form`\n" +
-//                "use /stop to abort `/form`\n", ParseMode.Markdown, replyMarkup: inline);
+            if (e.Message.Text == "/stop" || session.Status == SessionStatus.Finished)
+            {
+                this.user = new UserModel();
+                return null;
+            }
 
             if (session.Status == SessionStatus.Undefined)
             {
                 session.Status = SessionStatus.Started;
-                return session;
-            }
 
-            if (session.Status == SessionStatus.Started)
+                if (user.Name == null)
+                {
+                    await _botClient.SendTextMessageAsync(e.Message.Chat, "Enter your name");
+                    return session;
+                }
+
+                if (user.Age == null && user.Name != null)
+                {
+                    await _botClient.SendTextMessageAsync(e.Message.Chat, "Enter age");
+                    return session;
+                }
+            }
+            else if (session.Status == SessionStatus.Started)
             {
-                user.Name = await InputHelper.Insert("Enter your name below: ", e);
-                user.Age = Convert.ToInt32(await InputHelper.Insert("Enter age name below: ", e));
-            }
+                session.Status = SessionStatus.Undefined;
 
+                if (user.Name == null)
+                {
+                    user.Name = e.Message.Text;
+                    return session;
+                }
+
+                if (user.Age == null && user.Name != null)
+                {
+                    
+                    try
+                    {
+                        user.Age = Convert.ToInt32(e.Message.Text);
+                    }
+                    catch (Exception exception)
+                    {
+                        await _botClient.SendTextMessageAsync(e.Message.Chat, exception.Message);
+                        return session;
+                    }
+
+                    {
+                        await _botClient.SendTextMessageAsync(e.Message.Chat, $"Name: {user.Name}\n" +
+                                                                              $"Age: {user.Age}");
+                        session.Status = SessionStatus.Finished;
+                        this.user = new UserModel();
+                        return null;
+                    }
+                }
+            }
+            
             return session;
         }
     }

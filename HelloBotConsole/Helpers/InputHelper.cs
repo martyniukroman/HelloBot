@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
+using Telegram.Bot.Types.Enums;
 
 namespace HelloBotConsole.Helpers
 {
@@ -11,22 +12,22 @@ namespace HelloBotConsole.Helpers
     {
         private static bool IsWaitingForNextValue = true;
 
-        private static ITelegramBotClient botClient =
-            new TelegramBotClient("760620360:AAGq9KIBMccVIGo0Rbggq3Hn88ehgLVNq38");
-
-        public static async Task<string> Insert(string Message, MessageEventArgs e)
+        public static async Task<string> Insert(ITelegramBotClient botClient, string message, MessageEventArgs e)
         {
-//            if (e.Message.Text.Contains("/"))
-//            {
-//                throw new Exception("Your name Contains \'/\'");
-//            }
+            IsWaitingForNextValue = !IsWaitingForNextValue;
+
+            if (!IsWaitingForNextValue)
+            {
+                await botClient.SendTextMessageAsync(e.Message.Chat, message, ParseMode.Markdown);
+                return null;
+            }
 
             if (IsWaitingForNextValue)
             {
-                await botClient.SendTextMessageAsync(e.Message.Chat, Message);
-                IsWaitingForNextValue = !IsWaitingForNextValue;
-            }
                 return e.Message.Text;
+            }
+
+            return null;
         }
     }
 }
