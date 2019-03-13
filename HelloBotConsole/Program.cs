@@ -99,11 +99,11 @@ namespace HelloBotConsole
                                         e.Message.Chat.Id, "/help",
                                         SessionStatus.Undefined));
 
-                                _requestedSession = await _helpCommand.ExecuteCommand(e, Sessions.Last());
+                                _requestedSession = await _helpCommand.ExecuteCommand(e, Sessions.Find( (s) => s.SessionChatId == e.Message.Chat.Id));
                                 break;
                             case "/form":
                                 Sessions.Add(new Session(_formCommand, e.Message.Chat.Id, "/form", SessionStatus.Undefined));
-                                _requestedSession = await _formCommand.ExecuteCommand(e, Sessions.Last());
+                                _requestedSession = await _formCommand.ExecuteCommand(e, Sessions.Find( (s) => s.SessionChatId == e.Message.Chat.Id));
                                 break;
                             default:
                                 await botClient.SendTextMessageAsync(

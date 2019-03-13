@@ -14,19 +14,6 @@ namespace HelloBotConsole.Helpers
 
         public static async Task<string> Insert(ITelegramBotClient botClient, string message, Session session, MessageEventArgs e)
         {
-//            if (session.Status == SessionStatus.Undefined)
-//            {
-//                session.Status = SessionStatus.Started;
-//                await botClient.SendTextMessageAsync(e.Message.Chat, message, ParseMode.Markdown);
-//                return null;
-//            }
-//
-//            if (session.Status == SessionStatus.Started)
-//            {
-//                session.Status = SessionStatus.Undefined;
-//            }
-//                return e.Message.Text;
-
             if (!e.Message.Text.Contains("/"))
             {
                 return e.Message.Text;
